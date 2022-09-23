@@ -1,43 +1,58 @@
 <template>
-    <button class="bg-gray-300 hover:bg-gray-400 rounded-md shadow" :class="style + margin">{{ text }}</button>
+  <NuxtLink v-if="to" :to="to">
+    <button class="bg-gray-300 hover:bg-gray-400 rounded-md shadow" :class="style + margin" @click="clickEvent">
+      {{ text }}
+    </button>
+  </NuxtLink>
+
+  <button v-else class="bg-gray-300 hover:bg-gray-400 rounded-md shadow" :class="style + margin" @click="clickEvent">
+    {{ text }}
+  </button>
 </template>
 
 <script>
 export default {
-    props: {
-        text: {
-            type: String,
-            required: true
-        },
-        size: {
-            type: String,
-            default: 'sm',
-            required: false
-        },
-        margin: {
-            type: String,
-            default: 'm-1',
-            required: false
-        },
+  props: {
+    to: {
+      type: String,
+      default: '',
+      required: false
     },
-    data() {
-        return {}
+    text: {
+      type: String,
+      required: true
     },
-    computed: {
-        style() {
-            switch (this.size) {
-                case 'sm':
-                    return 'py-1 px-2 text-sm '
-                case 'md':
-                    return 'py-1 px-4 text-lg '
-                case 'lg':
-                    return 'py-3 px-6 text-xl '
-                case 'xl':
-                    return 'py-3 px-10 text-3xl '
-                default:
-                    return 'py-4 px-8'
-            }
-        },
+    size: {
+      type: String,
+      default: 'sm',
+      required: false
+    },
+    margin: {
+      type: String,
+      default: 'm-1',
+      required: false
     }
+  },
+  computed: {
+    style () {
+      switch (this.size) {
+        case 'sm':
+          return 'py-1 px-2 text-sm '
+        case 'md':
+          return 'py-1 px-4 text-lg '
+        case 'lg':
+          return 'py-3 px-6 text-xl '
+        case 'xl':
+          return 'py-3 px-10 text-3xl '
+        default:
+          return 'py-4 px-8'
+      }
+    }
+  },
+  methods: {
+    clickEvent () {
+      this.$emit('click')
+    }
+  }
 }
 </script>
