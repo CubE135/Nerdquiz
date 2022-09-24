@@ -4,17 +4,36 @@
       RoomCode: aDasd67asd
     </h1>
     <div v-if="board.length > 0" class="flex justify-center text-center">
-      <div v-for="category in board" :key="category.title" class="px-5 py-2 bg-gray-300">
+      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-300">
         <p class="m-1">
-          {{ category.title }}
+          <NerdInput :id="boardCategory.id" :value="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 text-center" @input="updateCategoryName($event, boardCategory.id)" />
         </p>
-        <p v-for="question in category.questions" :key="question.value" class="w-32 py-2 m-1" :class="question.color">
-          {{ question.level }}
-        </p>
+        <div v-for="boardQuestion in boardCategory.questions" :key="boardQuestion.id" class="w-32 py-2 m-1" :class="boardQuestion.color + ' ' + (boardQuestion.question === undefined || boardQuestion?.question?.value === '' ? 'border-2 border-dotted border-black' : 'border-2 border-solid border-black')">
+          <p @click="openModal('modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id); initQuestion(boardCategory.id, boardQuestion.level.id);">
+            {{ boardQuestion.level.value }}
+          </p>
+          <NerdModal :ref="'modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id" title="Frage bearbeiten" save-text="Board Updaten" @save="updateBoard">
+            <template v-if="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id})" #content>
+              <NerdSelect v-model="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id}).type" :options="questionTypes" />
+              <NerdInput v-model="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id}).value" placeholder="Frage eingeben" width="w-96" />
+            </template>
+          </NerdModal>
+        </div>
+        <NerdButton text="Löschen" size="sm" @click="removeCategory(boardCategory.id)" />
+      </div>
+      <div v-if="board.length > 0" class="flex flex-col pr-6 text-center bg-gray-300" style="padding-top: 40px;">
+        <NerdButton
+          v-for="level in levels"
+          :key="level.id"
+          text="Löschen"
+          size="sm"
+          class="deleteBtn"
+          @click="removeLevel(level.id)"
+        />
       </div>
     </div>
     <div v-else class="px-5 py-2 text-center bg-gray-300">
-      Noch keine Kategorien!
+      Füge Kategorien und Level hinzu!
     </div>
     <div class="flex justify-center">
       <NerdButton text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
@@ -22,15 +41,15 @@
     </div>
     <NerdModal ref="modalCategory" title="Kategorie hinzufügen" @save="addNewCategory">
       <template #content>
-        <NerdInput placeholder="Name eingeben" @input="setCategoryName" />
+        <NerdInput v-model="forms.category" placeholder="Name eingeben" />
       </template>
     </NerdModal>
     <NerdModal ref="modalLevel" title="Level hinzufügen" @save="addNewLevel">
       <template #content>
-        <NerdInput placeholder="Level eingeben" @input="setLevelAmount" />
+        <NerdInput v-model="forms.level" placeholder="Level eingeben" />
       </template>
     </NerdModal>
-  </NerdContainer>
+  </nerdcontainer>
 </template>
 
 <script>
@@ -38,13 +57,60 @@ export default {
   name: 'CreatePage',
   data () {
     return {
-      categories: [],
-      levels: [],
+      questionTypes: ['text', 'video', 'sound'],
+      categories: [
+        {
+          id: 0,
+          title: 'Technik'
+        },
+        {
+          id: 1,
+          title: 'Spiele'
+        },
+        {
+          id: 2,
+          title: 'Filme'
+        },
+        {
+          id: 3,
+          title: 'Bücher'
+        }
+      ],
+      levels: [
+        {
+          id: 0,
+          value: '100'
+        },
+        {
+          id: 1,
+          value: '200'
+        },
+        {
+          id: 2,
+          value: '500'
+        },
+        {
+          id: 3,
+          value: '800'
+        },
+        {
+          id: 4,
+          value: '1000'
+        }
+      ],
       players: [],
-      questions: [],
+      questions: [
+        {
+          id: 0,
+          category: 2,
+          level: 4,
+          type: 'video',
+          value: 'wie gehts?'
+        }
+      ],
       forms: {
         category: '',
-        level: 0
+        level: '0'
       }
     }
   },
@@ -61,37 +127,99 @@ export default {
         const index = colors.indexOf(color)
         colors.splice(index, 1)
         return {
-          title: category,
-          questions: this.levels.map((level, index) => {
+          id: category.id,
+          title: category.title,
+          questions: this.levels.map((level, questionIndex) => {
+            const question = this.questions.find((question) => {
+              return question.category === category.id && question.level === questionIndex
+            })
             return {
               level,
-              color: `bg-${color}-${index + 1}00`,
-              question: {
-                type: 'string',
-                value: 'Firmen1'
-              }
+              color: `bg-${color}-${questionIndex + 1}00`,
+              question
             }
           })
         }
       })
     }
   },
+  watch: {
+    board () {
+      this.updateBoard()
+    }
+  },
   methods: {
-    openModal (ref) {
-      this.$refs[ref].toggleModal()
+    updateBoard () {
+      // TODO: Send data to players
+      console.log('send changes to players')
     },
-    setCategoryName (value) {
-      this.forms.categoryName = value
+    openModal (ref) {
+      if (this.$refs[ref] instanceof Array) {
+        this.$refs[ref][0].toggleModal()
+      } else {
+        this.$refs[ref].toggleModal()
+      }
+    },
+    initQuestion (categoryId, levelId) {
+      const question = this.questions.find((question) => {
+        return question.category === categoryId && question.level === levelId
+      })
+      if (!question) {
+        const max = Math.max(...this.questions.map(q => q.id))
+        this.questions.push({
+          id: max + 1,
+          category: categoryId,
+          level: levelId,
+          type: 'text',
+          value: ''
+        })
+      }
     },
     addNewCategory () {
-      this.categories.push(this.forms.categoryName)
+      const max = Math.max(...this.categories.map(c => c.id))
+      this.categories.push({
+        id: max + 1,
+        title: this.forms.category
+      })
+      this.forms.category = ''
     },
-    setLevelAmount (value) {
-      this.forms.level = value
+    removeCategory (categoryId) {
+      this.categories = this.categories.filter((category) => {
+        return category.id !== categoryId
+      })
+      this.questions = this.questions.filter((question) => {
+        return question.category !== categoryId
+      })
     },
     addNewLevel () {
-      this.levels.push(this.forms.level)
+      const max = Math.max(...this.levels.map(l => l.id))
+      this.levels.push({
+        id: max + 1,
+        value: this.forms.level
+      })
+      this.levels = this.levels.sort(function (a, b) {
+        return a.value - b.value
+      })
+      this.forms.level = '0'
+    },
+    removeLevel (levelId) {
+      this.levels = this.levels.filter((level) => {
+        return level.id !== levelId
+      })
+      this.questions = this.questions.filter((question) => {
+        return question.level !== levelId
+      })
+    },
+    updateCategoryName (value, index) {
+      this.categories[index] = value
+      this.updateBoard()
     }
   }
 }
 </script>
+
+<style scoped>
+.deleteBtn {
+  margin: 9.5px 0px;
+}
+</style>

@@ -1,23 +1,49 @@
 <template>
-  <input v-model="value" class="m-1 p-1 rounded-md shadow focus:outline-none focus:ring focus:ring-gray-300" :placeholder="placeholder" @input="input"></input>
+  <input
+    v-model="inputVal"
+    class="rounded-md shadow focus:outline-none focus:ring focus:ring-gray-300"
+    :class="classes + ' ' + width"
+    :placeholder="placeholder"
+  ></input>
 </template>
 
 <script>
 export default {
   props: {
+    id: {
+      type: Number,
+      default: -1,
+      required: false
+    },
     placeholder: {
       type: String,
-      required: true
+      default: '',
+      required: false
+    },
+    classes: {
+      type: String,
+      default: 'p-1 m-1',
+      required: false
+    },
+    value: {
+      type: String,
+      default: '',
+      required: false
+    },
+    width: {
+      type: String,
+      default: '',
+      required: false
     }
   },
-  data () {
-    return {
-      value: ''
-    }
-  },
-  methods: {
-    input () {
-      this.$emit('input', this.value)
+  computed: {
+    inputVal: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        this.$emit('input', val.toString())
+      }
     }
   }
 }
