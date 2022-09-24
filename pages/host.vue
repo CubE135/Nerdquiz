@@ -58,56 +58,10 @@ export default {
   data () {
     return {
       questionTypes: ['text', 'video', 'sound'],
-      categories: [
-        {
-          id: 0,
-          title: 'Technik'
-        },
-        {
-          id: 1,
-          title: 'Spiele'
-        },
-        {
-          id: 2,
-          title: 'Filme'
-        },
-        {
-          id: 3,
-          title: 'Bücher'
-        }
-      ],
-      levels: [
-        {
-          id: 0,
-          value: '100'
-        },
-        {
-          id: 1,
-          value: '200'
-        },
-        {
-          id: 2,
-          value: '500'
-        },
-        {
-          id: 3,
-          value: '800'
-        },
-        {
-          id: 4,
-          value: '1000'
-        }
-      ],
+      categories: [],
+      levels: [],
       players: [],
-      questions: [
-        {
-          id: 0,
-          category: 2,
-          level: 4,
-          type: 'video',
-          value: 'wie gehts?'
-        }
-      ],
+      questions: [],
       forms: {
         category: '',
         level: '0'
