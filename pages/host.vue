@@ -1,12 +1,15 @@
 <template>
   <NerdContainer>
     <h1 class="p-5 text-4xl text-center">
-      RoomCode: aDasd67asd
+      <p>Room Code:</p>
+      <p v-if="roomCode">
+        {{ roomCode }}
+      </p>
     </h1>
     <div v-if="board.length > 0" class="flex justify-center text-center">
       <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-300">
         <p class="m-1">
-          <NerdInput :id="boardCategory.id" :value="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 text-center" @input="updateCategoryName($event, boardCategory.id)" />
+          <NerdInput v-model="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 text-center" placeholder="Kategorie Titel" />
         </p>
         <div v-for="boardQuestion in boardCategory.questions" :key="boardQuestion.id" class="w-32 py-2 m-1" :class="boardQuestion.color + ' ' + (boardQuestion.question === undefined || boardQuestion?.question?.value === '' ? 'border-2 border-dotted border-black' : 'border-2 border-solid border-black')">
           <p @click="openModal('modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id); initQuestion(boardCategory.id, boardQuestion.level.id);">
@@ -49,17 +52,58 @@
         <NerdInput v-model="forms.level" placeholder="Level eingeben" />
       </template>
     </NerdModal>
-  </nerdcontainer>
+  </NerdContainer>
 </template>
 
 <script>
+import socket from '~/plugins/socket.io.js'
+
 export default {
   name: 'CreatePage',
   data () {
     return {
+      roomCode: false,
       questionTypes: ['text', 'video', 'sound'],
-      categories: [],
-      levels: [],
+      categories: [
+        {
+          id: 0,
+          title: 'Technik'
+        },
+        {
+          id: 1,
+          title: 'Spiele'
+        },
+        {
+          id: 2,
+          title: 'Filme'
+        },
+        {
+          id: 3,
+          title: 'Bücher'
+        }
+      ],
+      levels: [
+        {
+          id: 0,
+          value: '100'
+        },
+        {
+          id: 1,
+          value: '200'
+        },
+        {
+          id: 2,
+          value: '500'
+        },
+        {
+          id: 3,
+          value: '800'
+        },
+        {
+          id: 4,
+          value: '1000'
+        }
+      ],
       players: [],
       questions: [],
       forms: {
@@ -102,10 +146,20 @@ export default {
       this.updateBoard()
     }
   },
+  mounted () {
+    if (!this.roomCode) {
+      this.roomCode = this.generateRoomCode()
+      socket.emit('create-room', this.roomCode)
+    }
+  },
   methods: {
+    generateRoomCode () {
+      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      )
+    },
     updateBoard () {
-      // TODO: Send data to players
-      console.log('send changes to players')
+      socket.emit('update-board', this.board)
     },
     openModal (ref) {
       if (this.$refs[ref] instanceof Array) {
