@@ -1,11 +1,11 @@
 <template>
   <NuxtLink v-if="to" :to="to">
-    <button class="bg-gray-300 hover:bg-gray-400 rounded-md shadow" :class="style + margin" @click="clickEvent">
+    <button class="bg-gray-300 rounded-md shadow hover:bg-gray-400" :class="style + margin + isDisabled" :disabled="disabled" @click="clickEvent">
       {{ text }}
     </button>
   </NuxtLink>
 
-  <button v-else class="bg-gray-300 hover:bg-gray-400 rounded-md shadow" :class="style + margin" @click="clickEvent">
+  <button v-else class="bg-gray-300 rounded-md shadow hover:bg-gray-400" :class="style + margin + isDisabled" @click="clickEvent">
     {{ text }}
   </button>
 </template>
@@ -31,6 +31,11 @@ export default {
       type: String,
       default: 'm-1',
       required: false
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+      required: false
     }
   },
   computed: {
@@ -47,6 +52,9 @@ export default {
         default:
           return 'py-4 px-8'
       }
+    },
+    isDisabled () {
+      return this.disabled ? ' disabled' : ''
     }
   },
   methods: {
@@ -56,3 +64,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.disabled {
+    pointer-events: none;
+    background-color: rgb(177 177 177);
+    color: #878787;
+}
+</style>

@@ -42,6 +42,19 @@
       <NerdButton text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
       <NerdButton text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
     </div>
+    <div class="flex justify-center">
+      <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted" @click="startGame" />
+    </div>
+
+    <div>
+      <h1>Players</h1>
+      <p v-for="player in players" :key="player">
+        {{ player.name }}
+        {{ player.points }}
+      </p>
+    </div>
+
+    <!-- Modals -->
     <NerdModal ref="modalCategory" title="Kategorie hinzufügen" @save="addNewCategory">
       <template #content>
         <NerdInput v-model="forms.category" placeholder="Name eingeben" />
@@ -63,6 +76,7 @@ export default {
   data () {
     return {
       roomCode: false,
+      roomStarted: false,
       questionTypes: ['text', 'video', 'sound'],
       categories: [
         {
@@ -148,18 +162,32 @@ export default {
   },
   mounted () {
     if (!this.roomCode) {
-      this.roomCode = this.generateRoomCode()
+      this.roomCode = this.generateRoomCode(10)
       socket.emit('create-room', this.roomCode)
     }
+    window.onpopstate = function () {
+      socket.disconnect()
+      socket.connect()
+    }
+    socket.on('player-joined', (players) => {
+      this.players = players
+    })
+    socket.on('player-left', (players) => {
+      this.players = players
+    })
   },
   methods: {
-    generateRoomCode () {
-      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-      )
+    generateRoomCode (length) {
+      let result = ''
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      const charactersLength = characters.length
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength))
+      }
+      return result
     },
     updateBoard () {
-      socket.emit('update-board', this.board)
+      socket.emit('update-board', this.board, this.roomStarted)
     },
     openModal (ref) {
       if (this.$refs[ref] instanceof Array) {
@@ -220,6 +248,10 @@ export default {
     },
     updateCategoryName (value, index) {
       this.categories[index] = value
+      this.updateBoard()
+    },
+    startGame () {
+      this.roomStarted = true
       this.updateBoard()
     }
   }

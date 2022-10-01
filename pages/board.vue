@@ -1,12 +1,9 @@
 <template>
   <NerdContainer>
     <h1 class="p-5 text-4xl text-center">
-      <p>Room Code:</p>
-      <p v-if="roomCode">
-        {{ roomCode }}
-      </p>
+      <p>Spielbrett:</p>
     </h1>
-    <div v-if="board.length > 0" class="flex justify-center text-center">
+    <div v-if="boardStatus && board.length > 0" class="flex justify-center text-center">
       <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-300">
         <p class="m-1">
           {{ boardCategory.title }}
@@ -18,6 +15,9 @@
         </div>
       </div>
     </div>
+    <p v-else class="text-center">
+      Der Host hat das Spiel noch nicht gestartet!
+    </p>
   </NerdContainer>
 </template>
 
@@ -29,7 +29,8 @@ export default {
   data () {
     return {
       roomCode: false,
-      board: false
+      board: false,
+      boardStatus: false
     }
   },
   head () {
@@ -40,12 +41,23 @@ export default {
   mounted () {
     if (socket.code) {
       this.roomCode = socket.code
+      if (this.$route.params.board) {
+        this.board = this.$route.params.board.board
+        this.boardStatus = this.$route.params.board.status
+      }
     } else {
       this.$router.push({ name: 'index' })
     }
 
     socket.on('update-board', (board) => {
-      this.board = board
+      this.board = board.board
+      this.boardStatus = board.status
+    })
+
+    socket.on('host-left', () => {
+      socket.disconnect()
+      socket.connect()
+      this.$router.push({ name: 'index' })
     })
   }
 }
