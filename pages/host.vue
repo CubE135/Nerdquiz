@@ -289,8 +289,12 @@ export default {
     },
     addNewCategory () {
       const max = Math.max(...this.categories.map(c => c.id))
+      let id = max + 1
+      if (this.categories.length === 0) {
+        id = 0
+      }
       this.categories.push({
-        id: max + 1,
+        id,
         title: this.forms.category
       })
       this.forms.category = ''
@@ -305,8 +309,12 @@ export default {
     },
     addNewLevel () {
       const max = Math.max(...this.levels.map(l => l.id))
+      let id = max + 1
+      if (this.levels.length === 0) {
+        id = 0
+      }
       this.levels.push({
-        id: max + 1,
+        id,
         value: this.forms.level
       })
       this.levels = this.levels.sort(function (a, b) {
