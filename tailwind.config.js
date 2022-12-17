@@ -8,7 +8,8 @@ module.exports = {
         amber: colors.amber,
         sky: colors.sky,
         violet: colors.violet,
-        orange: colors.orange
+        orange: colors.orange,
+        fuchsia: colors.fuchsia
       }
     }
   }

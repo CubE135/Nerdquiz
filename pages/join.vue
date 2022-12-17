@@ -36,6 +36,10 @@ export default {
       this.error = true
       this.errorMsg = 'Bitte wähle einen anderen Namen!'
     })
+    socket.on('already-running', () => {
+      this.error = true
+      this.errorMsg = 'Das Spiel hat bereits begonnen!'
+    })
     socket.on('room-joined', (code, board) => {
       socket.code = code
       this.$router.push({ name: 'board', params: { board } })
