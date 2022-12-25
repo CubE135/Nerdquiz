@@ -163,8 +163,6 @@
 </template>
 
 <script>
-import socket from '~/plugins/socket.io.js'
-
 export default {
   name: 'CreatePage',
   data () {
@@ -224,19 +222,19 @@ export default {
   mounted () {
     if (!this.roomCode) {
       this.roomCode = this.generateRoomCode(10)
-      socket.emit('create-room', this.roomCode)
+      this.$socket.emit('create-room', this.roomCode)
     }
     window.onpopstate = function () {
-      socket.disconnect()
-      socket.connect()
+      this.$socket.disconnect()
+      this.$socket.connect()
     }
-    socket.on('player-joined', (players) => {
+    this.$socket.on('player-joined', (players) => {
       this.players = players
     })
-    socket.on('player-left', (players) => {
+    this.$socket.on('player-left', (players) => {
       this.players = players
     })
-    socket.on('player-buzzed', (player) => {
+    this.$socket.on('player-buzzed', (player) => {
       this.activeQuestion.question.buzzed = {
         status: true,
         player
@@ -256,7 +254,7 @@ export default {
       return result
     },
     updateBoard () {
-      socket.emit('update-board', this.board, this.roomStarted, this.activeQuestion)
+      this.$socket.emit('update-board', this.board, this.roomStarted, this.activeQuestion)
     },
     openModal (ref) {
       if (this.$refs[ref] instanceof Array) {

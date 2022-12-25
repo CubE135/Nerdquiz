@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import socket from '~/plugins/socket.io.js'
-
 export default {
   name: 'JoinPage',
   data () {
@@ -28,27 +26,27 @@ export default {
     }
   },
   beforeMount () {
-    socket.on('room-not-found', () => {
+    this.$socket.on('room-not-found', () => {
       this.error = true
       this.errorMsg = 'Raum nicht gefunden!'
     })
-    socket.on('name-taken', () => {
+    this.$socket.on('name-taken', () => {
       this.error = true
       this.errorMsg = 'Bitte wähle einen anderen Namen!'
     })
-    socket.on('already-running', () => {
+    this.$socket.on('already-running', () => {
       this.error = true
       this.errorMsg = 'Das Spiel hat bereits begonnen!'
     })
-    socket.on('room-joined', (code, board) => {
-      socket.code = code
+    this.$socket.on('room-joined', (code, board) => {
+      this.$socket.code = code
       this.$router.push({ name: 'board', params: { board } })
     })
   },
   mounted () {
     window.onpopstate = function () {
-      socket.disconnect()
-      socket.connect()
+      this.$socket.disconnect()
+      this.$socket.connect()
     }
   },
   methods: {
@@ -63,9 +61,9 @@ export default {
         this.errorMsg = 'Bitte name eingeben!'
         return
       }
-      socket.name = this.name
+      this.$socket.name = this.name
       this.error = false
-      socket.emit('join-room', this.roomCode, this.name)
+      this.$socket.emit('join-room', this.roomCode, this.name)
     }
   }
 }

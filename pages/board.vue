@@ -47,8 +47,6 @@
 </template>
 
 <script>
-import socket from '~/plugins/socket.io.js'
-
 export default {
   name: 'BoardPage',
   data () {
@@ -65,8 +63,8 @@ export default {
     }
   },
   mounted () {
-    if (socket.code) {
-      this.roomCode = socket.code
+    if (this.$socket.code) {
+      this.roomCode = this.$socket.code
       if (this.$route.params.board) {
         this.board = this.$route.params.board.board
         this.boardStatus = this.$route.params.board.status
@@ -75,7 +73,7 @@ export default {
       this.$router.push({ name: 'index' })
     }
 
-    socket.on('update-board', (board) => {
+    this.$socket.on('update-board', (board) => {
       this.board = board.board
       this.boardStatus = board.status
       this.activeQuestion = board.activeQuestion
@@ -85,15 +83,15 @@ export default {
       }
     })
 
-    socket.on('host-left', () => {
-      socket.disconnect()
-      socket.connect()
+    this.$socket.on('host-left', () => {
+      this.$socket.disconnect()
+      this.$socket.connect()
       this.$router.push({ name: 'index' })
     })
   },
   methods: {
     pressBuzzer () {
-      socket.emit('buzz')
+      this.$socket.emit('buzz')
     },
     stopVideos () {
       const iframes = document.querySelectorAll('iframe')

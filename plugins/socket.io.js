@@ -1,5 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
 import io from 'socket.io-client'
-const socket = io(process.env.WS_URL)
 
-export default socket
+export default ({ app }, inject) => {
+  const socket = io(app.$config.wsUrl)
+  inject('socket', socket)
+}

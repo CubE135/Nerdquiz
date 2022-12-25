@@ -17,7 +17,7 @@ export default {
   },
 
   ssr: false,
-  target: 'static',
+  target: 'server',
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
@@ -27,6 +27,10 @@ export default {
   plugins: [
     {
       src: './plugins/dragndrop.js',
+      ssr: true
+    },
+    {
+      src: './plugins/socket.io.js',
       ssr: false
     }
   ],
@@ -48,8 +52,8 @@ export default {
     '@nuxtjs/axios'
   ],
 
-  env: {
-    WS_URL: process.env.WS_URL || 'http://localhost:3001'
+  publicRuntimeConfig: {
+    wsUrl: process.env.WS_URL || 'http://localhost:3001'
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -59,6 +63,5 @@ export default {
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {
-  }
+  build: {}
 }
