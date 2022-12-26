@@ -1,16 +1,17 @@
-const colors = require('tailwindcss/colors')
-
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  theme: {
-    extend: {
-      colors: {
-        lime: colors.lime,
-        amber: colors.amber,
-        sky: colors.sky,
-        violet: colors.violet,
-        orange: colors.orange,
-        fuchsia: colors.fuchsia
-      }
+  safelist: [
+    {
+      pattern: /bg-(red|blue|orange|lime|green|yellow|sky|violet|pink|fuchsia)/
     }
-  }
+  ],
+  content: [
+    './components/**/*.{js,vue,ts}',
+    './layouts/**/*.vue',
+    './pages/**/*.vue',
+    './plugins/**/*.{js,ts}',
+    './nuxt.config.{js,ts}'
+  ],
+  theme: {},
+  plugins: []
 }

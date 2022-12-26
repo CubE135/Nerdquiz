@@ -108,40 +108,40 @@
     </div>
 
     <!-- Player Table -->
-    <table class="w-full mt-10 text-sm bg-white border border-collapse shadow-sm table-fixed border-slate-400 dark:border-slate-500 dark:bg-slate-800">
-      <thead class="bg-slate-50 dark:bg-slate-700">
+    <table class="w-full mt-10 text-sm bg-white border border-collapse shadow-sm table-fixed border-slate-400 ">
+      <thead class="bg-slate-50 ">
         <tr>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200">
+          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
             Spieler
           </th>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200">
+          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
             Punkte
           </th>
-          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200">
+          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
             Plus
           </th>
-          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200">
+          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
             Minus
           </th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(player, index) in players" :key="index">
-          <td class="p-4 border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+          <td class="p-4 border border-slate-300 text-slate-500 ">
             {{ player.name }}
           </td>
-          <td class="p-4 border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+          <td class="p-4 border border-slate-300 text-slate-500 ">
             {{ player.points }}
           </td>
-          <td class="p-4 text-center border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
+          <td class="p-4 text-center border border-slate-300 text-slate-500 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
             +
           </td>
-          <td class="p-4 text-center border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
+          <td class="p-4 text-center border border-slate-300 text-slate-500 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
             -
           </td>
         </tr>
         <tr v-if="players.length === 0">
-          <td colspan="4" class="p-4 border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400">
+          <td colspan="4" class="p-4 border border-slate-300 text-slate-500 ">
             -
           </td>
         </tr>

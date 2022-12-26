@@ -16,8 +16,8 @@ export default {
     ]
   },
 
+  // Global CSS: https://go.nuxtjs.dev/config-ssr
   ssr: false,
-  target: 'server',
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
@@ -26,11 +26,11 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     {
-      src: './plugins/dragndrop.js',
+      src: '~/plugins/dragndrop.js',
       ssr: true
     },
     {
-      src: './plugins/socket.io.js',
+      src: '~/plugins/socket.io.js',
       ssr: false
     }
   ],
@@ -52,16 +52,17 @@ export default {
     '@nuxtjs/axios'
   ],
 
-  publicRuntimeConfig: {
-    wsUrl: process.env.WS_URL || 'http://localhost:3001'
-  },
-
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     baseURL: '/'
   },
 
+  publicRuntimeConfig: {
+    wsUrl: process.env.WS_URL || 'http://localhost:3001'
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {}
+  build: {
+  }
 }
