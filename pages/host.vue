@@ -27,8 +27,11 @@
         <span v-else-if="activeQuestion.question.type === 'video'">Schaue folgendes Video:</span>
         <span v-else-if="activeQuestion.question.type === 'sound'">Höre dir folgenden Sound an:</span>
       </div>
-      <div class="flex items-center justify-center flex-1 pointer-events-none">
-        <span v-if="activeQuestion.question.type === 'text'">{{ activeQuestion.question.value }}</span>
+      <div class="flex items-center justify-center flex-1 text-center pointer-events-none">
+        <div v-if="activeQuestion.question.type === 'text'">
+          {{ activeQuestion.question.value }}
+          <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
+        </div>
         <iframe
           v-else
           width="384"
@@ -58,10 +61,13 @@
           <p :class="activeQuestion && activeQuestion?.question?.id === boardQuestion?.question?.id ? 'no-pointer-events' : ''" @click="openModal('modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id); initQuestion(boardCategory.id, boardQuestion.level.id);">
             {{ boardQuestion.level.value }}
           </p>
-          <NerdModal :ref="'modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id" title="Frage bearbeiten" save-text="Board Updaten" @save="updateBoard">
+          <NerdModal :ref="'modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id" title="Frage bearbeiten" save-text="Board Updaten">
             <template v-if="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id})" #content>
-              <NerdSelect v-model="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id}).type" :options="questionTypes" />
-              <NerdInput v-model="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id}).value" placeholder="Frage eingeben" width="w-96" />
+              <div class="flex flex-col" :set="questionToEdit = questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id})" @save="updateBoard">
+                <NerdSelect v-model="questionToEdit.type" :options="questionTypes" />
+                <NerdInput v-model="questionToEdit.value" :placeholder="questionToEdit.type === 'text' ? 'Frage eingeben' : 'Video URL eingeben'" width="w-96" />
+                <NerdInput v-if="questionToEdit.type === 'text'" v-model="questionToEdit.img" placeholder="Bild URL eingeben (Optional)" />
+              </div>
             </template>
           </NerdModal>
 
@@ -79,7 +85,7 @@
             {{ boardQuestion.level.value }}
           </div>
         </div>
-        <NerdButton text="Löschen" size="sm" @click="removeCategory(boardCategory.id)" />
+        <NerdButton text="Löschen" size="sm" :class="roomStarted ? 'disabled' : ''" @click="removeCategory(boardCategory.id)" />
       </div>
       <div v-if="board.length > 0" class="flex flex-col pr-6 text-center bg-gray-300" style="padding-top: 40px;">
         <NerdButton
@@ -88,6 +94,7 @@
           text="Löschen"
           size="sm"
           class="deleteBtn"
+          :class="roomStarted ? 'disabled' : ''"
           @click="removeLevel(level.id)"
         />
       </div>
@@ -99,8 +106,8 @@
     </div>
     <div :style="drag ? 'pointer-events: none' : ''">
       <div class="flex justify-center">
-        <NerdButton :class="categories.length >= 10 ? 'disabled' : ''" text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
-        <NerdButton :class="levels.length >= 9 ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
+        <NerdButton :class="categories.length >= 10 || roomStarted ? 'disabled' : ''" text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
+        <NerdButton :class="levels.length >= 9 || roomStarted ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
       </div>
       <div class="flex justify-center">
         <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
@@ -174,8 +181,8 @@ export default {
       roomCode: false,
       roomStarted: false,
       questionTypes: ['text', 'video', 'sound'],
-      categories: [],
-      levels: [],
+      categories: [{ id: 0, title: 'Test' }, { id: 1, title: 'Test2' }, { id: 2, title: 'Test3' }],
+      levels: [{ id: 0, value: '100' }, { id: 1, value: '200' }, { id: 2, value: '300' }],
       players: [],
       questions: [],
       activeQuestion: null,
@@ -283,7 +290,8 @@ export default {
           answered: false,
           buzzed: false,
           type: 'text',
-          value: ''
+          value: '',
+          img: ''
         })
       }
     },

@@ -26,8 +26,11 @@
         <span v-else-if="activeQuestion.question.type === 'video'">Schaue folgendes Video:</span>
         <span v-else-if="activeQuestion.question.type === 'sound'">Höre dir folgenden Sound an:</span>
       </div>
-      <div class="flex items-center justify-center flex-1 pointer-events-none">
-        <span v-if="activeQuestion.question.type === 'text'">{{ activeQuestion.question.value }}</span>
+      <div class="flex items-center justify-center flex-1 text-center pointer-events-none">
+        <div v-if="activeQuestion.question.type === 'text'">
+          {{ activeQuestion.question.value }}
+          <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
+        </div>
         <iframe
           v-else
           width="384"
