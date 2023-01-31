@@ -43,6 +43,35 @@
     <div v-if="activeQuestion" class="absolute bottom-0 left-0 z-10 flex items-center justify-center w-full cursor-pointer h-44" :class="activeQuestion.question.buzzed ? 'bg-gray-500 no-pointer-events' : 'bg-red-400'" @click="pressBuzzer">
       Buzzer
     </div>
+
+    <!-- Player Table -->
+    <table class="w-full mt-10 text-sm bg-white border border-collapse shadow-sm table-fixed border-slate-400 ">
+      <thead class="bg-slate-50 ">
+        <tr>
+          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
+            Spieler
+          </th>
+          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
+            Punkte
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(player, index) in players" :key="index">
+          <td class="p-4 border border-slate-300 text-slate-500 ">
+            {{ player.name }}
+          </td>
+          <td class="p-4 border border-slate-300 text-slate-500 ">
+            {{ player.points }}
+          </td>
+        </tr>
+        <tr v-if="players.length === 0">
+          <td colspan="2" class="p-4 border border-slate-300 text-slate-500 ">
+            -
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </NerdContainer>
 </template>
 
@@ -54,7 +83,8 @@ export default {
       roomCode: false,
       board: false,
       boardStatus: false,
-      activeQuestion: null
+      activeQuestion: null,
+      players: []
     }
   },
   head () {
@@ -68,6 +98,7 @@ export default {
       if (this.$route.params.board) {
         this.board = this.$route.params.board.board
         this.boardStatus = this.$route.params.board.status
+        this.players = this.$route.params.board.players
       }
     } else {
       this.$router.push({ name: 'index' })
@@ -77,6 +108,7 @@ export default {
       this.board = board.board
       this.boardStatus = board.status
       this.activeQuestion = board.activeQuestion
+      this.players = board.players
 
       if (this.activeQuestion?.question?.buzzed) {
         this.stopVideos()

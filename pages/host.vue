@@ -103,7 +103,7 @@
         <NerdButton :class="levels.length >= 9 ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
       </div>
       <div class="flex justify-center">
-        <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted" @click="startGame" />
+        <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
       </div>
     </div>
 
@@ -133,10 +133,10 @@
           <td class="p-4 border border-slate-300 text-slate-500 ">
             {{ player.points }}
           </td>
-          <td class="p-4 text-center border border-slate-300 text-slate-500 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
+          <td class="p-4 text-lg text-center text-black border border-slate-300 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
             +
           </td>
-          <td class="p-4 text-center border border-slate-300 text-slate-500 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
+          <td class="p-4 text-lg text-center text-black border border-slate-300 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
             -
           </td>
         </tr>
@@ -230,9 +230,11 @@ export default {
     }
     this.$socket.on('player-joined', (players) => {
       this.players = players
+      this.updateBoard()
     })
     this.$socket.on('player-left', (players) => {
       this.players = players
+      this.updateBoard()
     })
     this.$socket.on('player-buzzed', (player) => {
       this.activeQuestion.question.buzzed = {
@@ -254,7 +256,7 @@ export default {
       return result
     },
     updateBoard () {
-      this.$socket.emit('update-board', this.board, this.roomStarted, this.activeQuestion)
+      this.$socket.emit('update-board', this.board, this.roomStarted, this.activeQuestion, this.players)
     },
     openModal (ref) {
       if (this.$refs[ref] instanceof Array) {
