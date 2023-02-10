@@ -34,9 +34,10 @@
         </div>
         <iframe
           v-else
+          :set="params = !!activeQuestion.question.videoStart && !!activeQuestion.question.videoEnd ? `&start=${activeQuestion.question.videoStart}&end=${activeQuestion.question.videoEnd}` : !!activeQuestion.question.videoStart ? '&start=' + activeQuestion.question.videoStart : !!activeQuestion.question.videoEnd ? '&end=' + activeQuestion.question.videoEnd : ''"
           width="384"
           height="248"
-          :src="activeQuestion.question.value + '?autoplay=1&controls=0&enablejsapi=1'"
+          :src="activeQuestion.question.value + '?autoplay=1&controls=0&enablejsapi=1' + params"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           :class="activeQuestion.question.type === 'sound' ? 'hidden' : ''"
@@ -67,6 +68,9 @@
                 <NerdSelect v-model="questionToEdit.type" :options="questionTypes" />
                 <NerdInput v-model="questionToEdit.value" :placeholder="questionToEdit.type === 'text' ? 'Frage eingeben' : 'Video URL eingeben'" width="w-96" />
                 <NerdInput v-if="questionToEdit.type === 'text'" v-model="questionToEdit.img" placeholder="Bild URL eingeben (Optional)" />
+
+                <NerdInput v-if="questionToEdit.type !== 'text'" v-model="questionToEdit.videoStart" placeholder="Startzeit in Sekunden (Optional)" />
+                <NerdInput v-if="questionToEdit.type !== 'text'" v-model="questionToEdit.videoEnd" placeholder="Endzeit in Sekunden (Optional)" />
               </div>
             </template>
           </NerdModal>
@@ -77,7 +81,7 @@
             v-draggable
             class="dragBody"
             :class="drag ? 'no-pointer-events' : ''"
-            style="transform: translate(0px, 0px) translateX(38px) translateY(-37px);"
+            style="transform: translate(0px, 0px) translateX(38px) translateY(-37px); cursor: grab;"
             :style="drag === boardCategory.id + '_' + boardQuestion.level.id ? 'opacity: 1;' : ''"
             @start="drag = boardCategory.id + '_' + boardQuestion.level.id"
             @stop="dragStop(boardQuestion)"
@@ -291,7 +295,9 @@ export default {
           buzzed: false,
           type: 'text',
           value: '',
-          img: ''
+          img: '',
+          videoStart: false,
+          videoEnd: false
         })
       }
     },

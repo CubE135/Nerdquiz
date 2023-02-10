@@ -39,7 +39,7 @@ export default {
   computed: {
     inputVal: {
       get () {
-        return this.value
+        return this.value !== false ? this.value : ''
       },
       set (val) {
         this.$emit('input', val.toString())
