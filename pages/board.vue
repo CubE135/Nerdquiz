@@ -20,7 +20,7 @@
     </p>
 
     <div v-if="activeQuestion" class="absolute top-0 left-0 w-screen h-screen bg-black opacity-40" />
-    <div v-if="activeQuestion" class="absolute z-10 flex flex-col items-center transform bg-red-400 w-96 h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
+    <div v-if="activeQuestion" class="absolute z-10 flex flex-col items-center transform bg-red-400 w-96 min-h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
       <div class="flex items-center justify-center flex-none w-full h-10 border-b border-gray-600">
         <span v-if="activeQuestion.question.type === 'text'">Beantworte folgende Frage:</span>
         <span v-else-if="activeQuestion.question.type === 'video'">Schaue folgendes Video:</span>
@@ -41,6 +41,15 @@
           :class="activeQuestion.question.type === 'sound' ? 'hidden' : ''"
         />
         <span v-if="activeQuestion.question.type === 'sound'">Genau hinhören...</span>
+      </div>
+      <div v-if="activeQuestion.question.buzzed && activeQuestion.question.buzzed.player === $socket.name && !answered" class="flex flex-col items-center justify-center flex-1 text-center">
+        <p>Antwort:</p>
+        <NerdInput v-model="answer" placeholder="Bitte Antwort eingeben..." />
+        <NerdButton text="Absenden" size="sm" @click="sendAnswer" />
+      </div>
+      <div v-if="activeQuestion.question.answer !== ''" class="flex flex-col items-center justify-center flex-1 text-center">
+        <p>Die Antwort von {{ activeQuestion.question.buzzed.player }} lautet:</p>
+        <p>{{ activeQuestion.question.answer }}</p>
       </div>
     </div>
     <div v-if="activeQuestion" class="absolute bottom-0 left-0 z-10 flex items-center justify-center w-full cursor-pointer h-44" :class="activeQuestion.question.buzzed ? 'bg-gray-500 no-pointer-events' : 'bg-red-400'" @click="pressBuzzer">
@@ -87,6 +96,8 @@ export default {
       board: false,
       boardStatus: false,
       activeQuestion: null,
+      answer: '',
+      answered: false,
       players: []
     }
   },
@@ -126,6 +137,8 @@ export default {
   },
   methods: {
     pressBuzzer () {
+      this.answer = ''
+      this.answered = false
       this.$socket.emit('buzz')
     },
     stopVideos () {
@@ -133,6 +146,11 @@ export default {
       Array.prototype.forEach.call(iframes, (iframe) => {
         iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'stopVideo' }), '*')
       })
+    },
+    sendAnswer () {
+      this.$socket.emit('answer', this.answer)
+      this.answer = ''
+      this.answered = true
     }
   }
 }

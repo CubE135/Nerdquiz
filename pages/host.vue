@@ -48,8 +48,11 @@
         Frage Schließen
       </div>
     </div>
-    <div v-if="activeQuestion && activeQuestion.question.buzzed" class="absolute bottom-0 left-0 z-10 flex items-center justify-center w-full bg-red-400 h-44">
-      {{ activeQuestion.question.buzzed.player }} hat gebuzzert!
+    <div v-if="activeQuestion && activeQuestion.question.buzzed" class="absolute bottom-0 left-0 z-10 flex flex-col items-center justify-center w-full bg-red-400 h-44">
+      <p>{{ activeQuestion.question.buzzed.player }} hat gebuzzert!</p>
+      <p v-if="activeQuestion.question.answer !== ''">
+        {{ activeQuestion.question.buzzed.player }} hat geantwortet: {{ activeQuestion.question.answer }}
+      </p>
     </div>
 
     <!-- Board -->
@@ -255,6 +258,11 @@ export default {
       this.updateBoard()
       this.stopVideos()
     })
+
+    this.$socket.on('answered', (answer) => {
+      this.activeQuestion.question.answer = answer
+      this.updateBoard()
+    })
   },
   methods: {
     generateRoomCode (length) {
@@ -292,6 +300,7 @@ export default {
           category: categoryId,
           level: levelId,
           answered: false,
+          answer: '',
           buzzed: false,
           type: 'text',
           value: '',
