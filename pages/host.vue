@@ -21,15 +21,23 @@
 
     <!-- ActiveQuestion -->
     <div v-if="activeQuestion" class="absolute top-0 left-0 w-screen h-screen bg-black opacity-40" />
-    <div v-if="activeQuestion" class="absolute z-10 flex flex-col items-center transform bg-red-400 w-96 h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
+    <div v-if="activeQuestion" class="absolute z-40 flex flex-col items-center transform bg-red-400 w-96 h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
       <div class="flex items-center justify-center flex-none w-full h-10 border-b border-gray-600">
         <span v-if="activeQuestion.question.type === 'text'">Beantworte folgende Frage:</span>
         <span v-else-if="activeQuestion.question.type === 'video'">Schaue folgendes Video:</span>
         <span v-else-if="activeQuestion.question.type === 'sound'">Höre dir folgenden Sound an:</span>
+        <span v-else-if="activeQuestion.question.type === 'choice'">Wähle die richtige Antwort:</span>
       </div>
       <div class="flex items-center justify-center flex-1 text-center pointer-events-none">
         <div v-if="activeQuestion.question.type === 'text'">
           {{ activeQuestion.question.value }}
+          <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
+        </div>
+        <div v-else-if="activeQuestion.question.type === 'choice'">
+          {{ activeQuestion.question.value }}
+          <div v-for="(value, i) in activeQuestion.question.choices.split(',')" :key="i">
+            - {{ value }}
+          </div>
           <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
         </div>
         <iframe
@@ -44,14 +52,21 @@
         />
         <span v-if="activeQuestion.question.type === 'sound'">Genau hinhören...</span>
       </div>
-      <div class="px-2 py-1 m-1 text-sm bg-gray-300 rounded-md shadow cursor-pointer hover:bg-gray-400" @click="closeActiveQuestion">
-        Frage Schließen
+      <div>
+        <div class="inline-block px-2 py-1 m-1 text-sm bg-gray-300 rounded-md shadow cursor-pointer hover:bg-gray-400" @click="startActiveQuestion">
+          Frage Starten
+        </div>
+        <div class="inline-block px-2 py-1 m-1 text-sm bg-gray-300 rounded-md shadow cursor-pointer hover:bg-gray-400" @click="closeActiveQuestion">
+          Frage Schließen
+        </div>
       </div>
     </div>
     <div v-if="activeQuestion && activeQuestion.question.buzzed" class="absolute bottom-0 left-0 z-10 flex flex-col items-center justify-center w-full bg-red-400 h-44">
       <p>{{ activeQuestion.question.buzzed.player }} hat gebuzzert!</p>
       <p v-if="activeQuestion.question.answer !== ''">
         {{ activeQuestion.question.buzzed.player }} hat geantwortet: {{ activeQuestion.question.answer }}
+        <br>
+        Die richtige Lösung ist: {{ activeQuestion.question.solution }}
       </p>
     </div>
 
@@ -69,11 +84,22 @@
             <template v-if="questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id})" #content>
               <div class="flex flex-col" :set="questionToEdit = questions.find((question) => { return question.category === boardCategory.id && question.level === boardQuestion.level.id})" @save="updateBoard">
                 <NerdSelect v-model="questionToEdit.type" :options="questionTypes" />
-                <NerdInput v-model="questionToEdit.value" :placeholder="questionToEdit.type === 'text' ? 'Frage eingeben' : 'Video URL eingeben'" width="w-96" />
-                <NerdInput v-if="questionToEdit.type === 'text'" v-model="questionToEdit.img" placeholder="Bild URL eingeben (Optional)" />
 
-                <NerdInput v-if="questionToEdit.type !== 'text'" v-model="questionToEdit.videoStart" placeholder="Startzeit in Sekunden (Optional)" />
-                <NerdInput v-if="questionToEdit.type !== 'text'" v-model="questionToEdit.videoEnd" placeholder="Endzeit in Sekunden (Optional)" />
+                <NerdInput v-model="questionToEdit.value" :placeholder="['text', 'choice'].includes(questionToEdit.type) ? 'Frage eingeben' : 'Video URL eingeben'" width="w-96" />
+
+                <NerdInput v-if="['choice'].includes(questionToEdit.type)" v-model="questionToEdit.choices" placeholder="Antwortmöglichkeiten, mit \',\' getrennt" />
+
+                <NerdInput v-if="['text', 'choice'].includes(questionToEdit.type)" v-model="questionToEdit.img" placeholder="Bild URL eingeben (Optional)" />
+
+                <NerdInput v-if="!['text', 'choice'].includes(questionToEdit.type)" v-model="questionToEdit.videoStart" placeholder="Startzeit in Sekunden (Optional)" />
+                <NerdInput v-if="!['text', 'choice'].includes(questionToEdit.type)" v-model="questionToEdit.videoEnd" placeholder="Endzeit in Sekunden (Optional)" />
+
+                <p>Lösung:</p>
+
+                <NerdInput v-model="questionToEdit.solution" placeholder="Dient dem Host als Erinnerung" />
+
+                <p>Antwort eingeben:</p>
+                <NerdSelect v-model="questionToEdit.inputAnswer" :options="['ja', 'nein']" />
               </div>
             </template>
           </NerdModal>
@@ -187,7 +213,7 @@ export default {
       dragHoverData: null,
       roomCode: false,
       roomStarted: false,
-      questionTypes: ['text', 'video', 'sound'],
+      questionTypes: ['text', 'video', 'sound', 'choice'],
       categories: [],
       levels: [],
       players: [],
@@ -301,12 +327,14 @@ export default {
           level: levelId,
           answered: false,
           answer: '',
+          solution: '',
           buzzed: false,
           type: 'text',
           value: '',
           img: '',
           videoStart: false,
-          videoEnd: false
+          videoEnd: false,
+          inputAnswer: 'ja'
         })
       }
     },
@@ -367,7 +395,7 @@ export default {
           this.modifyPlayerPoints(question)
           break
         case 'dragStartQuestion':
-          this.startQuestion(question)
+          this.setActiveQuestion(question)
           break
         default:
           break
@@ -404,13 +432,21 @@ export default {
         this.updateBoard()
       }
     },
-    startQuestion (question) {
+    setActiveQuestion (question) {
+      this.questions.find((quest) => {
+        return quest.id === question.question.id
+      }).answer = ''
       this.activeQuestion = question
+      this.activeQuestion.started = false
       this.updateBoard()
     },
     closeActiveQuestion () {
       this.activeQuestion.question.buzzed = false
       this.activeQuestion = null
+      this.updateBoard()
+    },
+    startActiveQuestion () {
+      this.activeQuestion.started = true
       this.updateBoard()
     },
     stopVideos () {

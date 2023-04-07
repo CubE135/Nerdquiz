@@ -20,15 +20,26 @@
     </p>
 
     <div v-if="activeQuestion" class="absolute top-0 left-0 w-screen h-screen bg-black opacity-40" />
-    <div v-if="activeQuestion" class="absolute z-10 flex flex-col items-center transform bg-red-400 w-96 min-h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
-      <div class="flex items-center justify-center flex-none w-full h-10 border-b border-gray-600">
+    <div v-if="activeQuestion" class="absolute z-40 flex flex-col items-center transform bg-red-400 w-96 min-h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
+      <div v-if="!activeQuestion.started">
+        Warten auf den Host...
+      </div>
+      <div v-if="activeQuestion.started" class="flex items-center justify-center flex-none w-full h-10 border-b border-gray-600">
         <span v-if="activeQuestion.question.type === 'text'">Beantworte folgende Frage:</span>
         <span v-else-if="activeQuestion.question.type === 'video'">Schaue folgendes Video:</span>
         <span v-else-if="activeQuestion.question.type === 'sound'">Höre dir folgenden Sound an:</span>
+        <span v-else-if="activeQuestion.question.type === 'choice'">Wähle die richtige Antwort:</span>
       </div>
-      <div class="flex items-center justify-center flex-1 text-center pointer-events-none">
+      <div v-if="activeQuestion.started" class="flex items-center justify-center flex-1 text-center pointer-events-none">
         <div v-if="activeQuestion.question.type === 'text'">
           {{ activeQuestion.question.value }}
+          <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
+        </div>
+        <div v-else-if="activeQuestion.question.type === 'choice'">
+          {{ activeQuestion.question.value }}
+          <div v-for="(value, i) in activeQuestion.question.choices.split(',')" :key="i">
+            - {{ value }}
+          </div>
           <img v-if="activeQuestion.question.img" :src="activeQuestion.question.img">
         </div>
         <iframe
@@ -42,12 +53,12 @@
         />
         <span v-if="activeQuestion.question.type === 'sound'">Genau hinhören...</span>
       </div>
-      <div v-if="activeQuestion.question.buzzed && activeQuestion.question.buzzed.player === $socket.name && !answered" class="flex flex-col items-center justify-center flex-1 text-center">
+      <div v-if="activeQuestion.started && activeQuestion.question.buzzed && activeQuestion.question.buzzed.player === $socket.name && !answered && activeQuestion.question.inputAnswer === 'ja'" class="flex flex-col items-center justify-center flex-1 text-center">
         <p>Antwort:</p>
         <NerdInput v-model="answer" placeholder="Bitte Antwort eingeben..." />
         <NerdButton text="Absenden" size="sm" @click="sendAnswer" />
       </div>
-      <div v-if="activeQuestion.question.answer !== ''" class="flex flex-col items-center justify-center flex-1 text-center">
+      <div v-if="activeQuestion.started && activeQuestion.question.answer !== ''" class="flex flex-col items-center justify-center flex-1 text-center">
         <p>Die Antwort von {{ activeQuestion.question.buzzed.player }} lautet:</p>
         <p>{{ activeQuestion.question.answer }}</p>
       </div>
