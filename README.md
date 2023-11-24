@@ -27,7 +27,7 @@ yarn build
 docker build . -t something/nerdquiz
 ```
 
-Then, run the command from the "Usage" Section above with the corresponding image name.
+Then, run the command from the "Usage"-Section above with the corresponding image name.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
