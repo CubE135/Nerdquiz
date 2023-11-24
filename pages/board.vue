@@ -4,7 +4,7 @@
       <p>Spielbrett:</p>
     </h1>
     <div v-if="boardStatus && board.length > 0" class="flex justify-center text-center">
-      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-300">
+      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-900">
         <p class="m-1">
           {{ boardCategory.title }}
         </p>
@@ -68,33 +68,35 @@
     </div>
 
     <!-- Player Table -->
-    <table class="w-full mt-10 text-sm bg-white border border-collapse shadow-sm table-fixed border-slate-400 ">
-      <thead class="bg-slate-50 ">
-        <tr>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Spieler
-          </th>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Punkte
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(player, index) in players" :key="index">
-          <td class="p-4 border border-slate-300 text-slate-500 ">
-            {{ player.name }}
-          </td>
-          <td class="p-4 border border-slate-300 text-slate-500 ">
-            {{ player.points }}
-          </td>
-        </tr>
-        <tr v-if="players.length === 0">
-          <td colspan="2" class="p-4 border border-slate-300 text-slate-500 ">
-            -
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="relative pt-4 overflow-x-auto shadow-md">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th class="px-6 py-3">
+              Spieler
+            </th>
+            <th class="px-6 py-3">
+              Punkte
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(player, index) in players" :key="index" class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+            <td class="px-6 py-4">
+              {{ player.name }}
+            </td>
+            <td class="px-6 py-4">
+              {{ player.points }}
+            </td>
+          </tr>
+          <tr v-if="players.length === 0">
+            <td colspan="2" class="px-6 py-4">
+              -
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </NerdContainer>
 </template>
 

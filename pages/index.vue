@@ -1,19 +1,17 @@
 <template>
-  <NerdCenterContainer>
-    <div class="flex justify-evenly">
-      <NerdButton to="/host" text="Erstellen" size="lg" />
-      <NerdButton to="/join" text="Beitreten" size="lg" />
-    </div>
-  </NerdCenterContainer>
+  <div>
+    <NerdCenterContainer>
+      <div class="flex justify-evenly">
+        <NerdButton to="/host" text="Erstellen" size="lg" />
+        <NerdButton to="/join" text="Beitreten" size="lg" />
+      </div>
+    </NerdCenterContainer>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'IndexPage',
-  head () {
-    return {
-      title: 'Startseite'
-    }
-  }
+  name: 'IndexPage'
+
 }
 </script>
