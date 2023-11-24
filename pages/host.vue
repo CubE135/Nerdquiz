@@ -1,7 +1,7 @@
 <template>
   <NerdContainer>
     <!-- Room Code -->
-    <h1 class="p-5 text-4xl text-center">
+    <h1 ref="heading" class="p-5 text-4xl font-bold text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
       <p>Room Code:</p>
       <p v-if="roomCode">
         {{ roomCode }}
@@ -71,10 +71,10 @@
     </div>
 
     <!-- Board -->
-    <div v-if="board.length > 0" class="flex justify-center text-center" :style="drag ? 'pointer-events: none' : ''">
-      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 bg-gray-300">
+    <div v-if="board.length >0" class="flex justify-center text-center" :style="drag ? 'pointer-events: none' : ''">
+      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 mt-2 bg-gray-50 dark:bg-gray-700">
         <p class="m-1">
-          <NerdInput v-model="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 text-center" placeholder="Kategorie Titel" />
+          <NerdInput v-model="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 justify-center text-center" placeholder="Kategorie Titel" />
         </p>
         <div v-for="boardQuestion in boardCategory.questions" :key="boardQuestion.id" class="w-32 py-2 m-1" :class="boardQuestion.color + ' ' + (boardQuestion.question === undefined || boardQuestion?.question?.value === '' ? 'border-2 border-dotted border-black' : 'border-2 border-solid border-black') + (boardQuestion?.question?.answered ? ' answered' : '')">
           <p :class="activeQuestion && activeQuestion?.question?.id === boardQuestion?.question?.id ? 'no-pointer-events' : ''" @click="openModal('modalQuestion_' + boardCategory.id + '_' + boardQuestion.level.id); initQuestion(boardCategory.id, boardQuestion.level.id);">
@@ -120,7 +120,7 @@
         </div>
         <NerdButton text="Löschen" size="sm" :class="roomStarted ? 'disabled' : ''" @click="removeCategory(boardCategory.id)" />
       </div>
-      <div v-if="board.length > 0" class="flex flex-col pr-6 text-center bg-gray-300" style="padding-top: 40px;">
+      <div v-if="board.length > 0" class="flex flex-col p-5 pr-6 text-center bg-middlegray" style="padding-top: 40px;">
         <NerdButton
           v-for="level in levels"
           :key="level.id"
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Board Actions -->
-    <div v-else class="px-5 py-2 text-center bg-gray-300">
+    <div v-else class="px-5 py-2 font-bold text-center dark:text-gray-400 test-sm">
       Füge Kategorien und Level hinzu!
     </div>
     <div :style="drag ? 'pointer-events: none' : ''">
@@ -142,52 +142,51 @@
         <NerdButton :class="categories.length >= 10 || roomStarted ? 'disabled' : ''" text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
         <NerdButton :class="levels.length >= 9 || roomStarted ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
       </div>
-      <div class="flex justify-center">
-        <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
-      </div>
     </div>
 
     <!-- Player Table -->
-    <table class="w-full mt-10 text-sm bg-white border border-collapse shadow-sm table-fixed border-slate-400 ">
-      <thead class="bg-slate-50 ">
-        <tr>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Spieler
-          </th>
-          <th class="w-1/2 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Punkte
-          </th>
-          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Plus
-          </th>
-          <th class="w-1/6 p-4 font-semibold text-left border border-slate-300 text-slate-900 ">
-            Minus
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(player, index) in players" :key="index">
-          <td class="p-4 border border-slate-300 text-slate-500 ">
-            {{ player.name }}
-          </td>
-          <td class="p-4 border border-slate-300 text-slate-500 ">
-            {{ player.points }}
-          </td>
-          <td class="p-4 text-lg text-center text-black border border-slate-300 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
-            +
-          </td>
-          <td class="p-4 text-lg text-center text-black border border-slate-300 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
-            -
-          </td>
-        </tr>
-        <tr v-if="players.length === 0">
-          <td colspan="4" class="p-4 border border-slate-300 text-slate-500 ">
-            -
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
+    <div class="relative mt-2 overflow-x-auto shadow-md">
+      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th class="px-6 py-3">
+              Spieler
+            </th>
+            <th class="px-6 py-3">
+              Punkte
+            </th>
+            <th class="px-6 py-3">
+              Plus
+            </th>
+            <th class="px-6 py-3">
+              Minus
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(player, index) in players" :key="index" class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+            <td class="px-6 py-4">
+              {{ player.name }}
+            </td>
+            <td class="px-6 py-4">
+              {{ player.points }}
+            </td>
+            <td class="p-4 text-xl text-center text-black border border-slate-300 adjustPointsContainer add" :class="dragHoverType === 'dragPlayerPoints' && dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: true })" @mouseout="dragMouseover(null, null)">
+              +
+            </td>
+            <td class="p-4 text-xl text-center text-black border border-slate-300 adjustPointsContainer remove" :class="dragHoverType === 'dragPlayerPoints' && !dragHoverData.add && dragHoverData.player === index ? '' : 'disabled'" @mouseover="dragMouseover('dragPlayerPoints', { player: index, add: false })" @mouseout="dragMouseover(null, null)">
+              -
+            </td>
+          </tr>
+          <tr v-if="players.length === 0">
+            <td colspan="4" class="w-full text-sm text-left text-gray-500 dark:text-gray-400" />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-center">
+      <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
+    </div>
     <!-- Modals -->
     <NerdModal ref="modalCategory" title="Kategorie hinzufügen" @save="addNewCategory">
       <template #content>
@@ -483,7 +482,7 @@ export default {
   pointer-events: none;
 }
 .disabled {
-  filter: opacity(0.5);
+  filter: opacity(0.7);
 }
 .answered {
     pointer-events: none;
