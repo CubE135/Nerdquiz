@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="relative flex justify-center min-h-screen items-top sm:items-center sm:pt-0"
-  >
+  <div class="relative flex justify-center min-h-screen items-top sm:items-center sm:pt-0">
     <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
       <NerdLogo v-if="logo" />
       <Particles
@@ -12,12 +10,52 @@
       />
       <slot />
     </div>
+    <a
+      id="dropdownHoverButton"
+      href="https://rocketbeans.tv"
+      target="blank"
+      data-dropdown-toggle="dropdownHover"
+      data-dropdown-trigger="hover"
+      class="absolute top-0 left-0 mt-3 mb-2 ml-3"
+    >
+      <img src="~/assets/icons/rbtv.svg" alt="*" class="w-12 h-12">
+    </a>
+    <div id="dropdownHover" class="z-10 hidden">
+      <ul class="" aria-labelledby="dropdownHoverButton">
+        <li>
+          <a href="https://twitter.com/TheRocketBeans" class="block mb-2" target="blank">
+            <img src="~/assets/icons/x.svg" alt="*" class="w-12 h-12">
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/rocketbeans.tv/?hl=de" class="block mb-2" target="blank">
+            <img src="~/assets/icons/instagram.png" alt="*" class="w-12 h-12">
+          </a>
+        </li>
+        <li>
+          <a href="https://www.twitch.tv/rocketbeanstv" class="block mb-2" target="blank">
+            <img src="~/assets/icons/twitch.svg" alt="*" class="w-12 h-12">
+          </a>
+        </li>
+        <li>
+          <a href="https://www.youtube.com/c/ROCKETBEANSTV" class="block mb-2" target="blank">
+            <img src="~/assets/icons/youtube.svg" alt="*" class="w-12 h-12">
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
+import { onMounted } from 'vue'
+import { initFlowbite } from 'flowbite'
 
 import { loadFull } from 'tsparticles'
+
+onMounted(() => {
+  initFlowbite()
+})
 export default {
   props: {
     logo: {
