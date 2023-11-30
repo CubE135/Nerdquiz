@@ -10,8 +10,23 @@ module.exports = {
     './layouts/**/*.vue',
     './pages/**/*.vue',
     './plugins/**/*.{js,ts}',
-    './nuxt.config.{js,ts}'
+    './nuxt.config.{js,ts}',
+    './node_modules/flowbite/**/*.{js,ts}'
   ],
-  theme: {},
-  plugins: []
+  theme: {
+    extend: {
+      colors: {
+        lightorange: '#FBC65B',
+        darkorange: '#F29400',
+        black: '#000000',
+        mediumgray: '#100F12',
+        lightgray: '#454547',
+        lightwhite: '#EBEBEB',
+        graphitblack: '#1c1c1c'
+      }
+    }
+  },
+  plugins: [
+    require('flowbite/plugin')
+  ]
 }

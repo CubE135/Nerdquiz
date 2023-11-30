@@ -32,6 +32,10 @@ export default {
     {
       src: '~/plugins/socket.io.js',
       ssr: false
+    },
+    {
+      src: '~/plugins/particles.js',
+      ssr: false
     }
   ],
 
