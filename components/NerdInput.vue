@@ -1,10 +1,5 @@
 <template>
-  <input
-    v-model="inputVal"
-    class="rounded-md shadow focus:outline-none focus:ring focus:ring-gray-300"
-    :class="classes + ' ' + width"
-    :placeholder="placeholder"
-  ></input>
+  <input v-model="inputVal" class="rounded-md shadow focus:outline-none focus:ring focus:ring-gray-300" :class="classes + ' ' + width" :placeholder="placeholder">
 </template>
 
 <script>

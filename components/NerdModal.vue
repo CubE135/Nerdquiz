@@ -3,7 +3,7 @@
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
       <div class="relative w-auto max-w-6xl mx-auto my-6">
         <!--content-->
-        <div class="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
+        <div class="relative flex flex-col w-full border-0 rounded-lg shadow-lg outline-none bg-lightwhite focus:outline-none">
           <!--header-->
           <div class="flex items-start justify-between p-5 border-b border-solid rounded-t border-slate-200">
             <h3 class="text-2xl font-semibold">

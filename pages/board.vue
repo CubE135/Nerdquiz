@@ -1,6 +1,6 @@
 <template>
   <NerdContainer>
-    <h1 class="p-5 text-4xl text-center">
+    <h1 class="p-5 text-4xl text-center bg-lightwhite">
       <p>Spielbrett:</p>
     </h1>
     <div v-if="boardStatus && board.length > 0" class="flex justify-center text-center">
@@ -15,12 +15,12 @@
         </div>
       </div>
     </div>
-    <p v-else class="text-center">
+    <p v-else class="text-center bg-lightwhite">
       Der Host hat das Spiel noch nicht gestartet!
     </p>
 
     <div v-if="activeQuestion" class="absolute top-0 left-0 w-screen h-screen bg-black opacity-40" />
-    <div v-if="activeQuestion" class="absolute z-40 flex flex-col items-center transform bg-red-400 w-96 min-h-72 top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
+    <div v-if="activeQuestion" class="absolute z-40 flex flex-col items-center transform bg-red-400 w-96 min-h-72 top-1/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
       <div v-if="!activeQuestion.started">
         Warten auf den Host...
       </div>
@@ -63,39 +63,27 @@
         <p>{{ activeQuestion.question.answer }}</p>
       </div>
     </div>
-    <div v-if="activeQuestion" class="absolute bottom-0 left-0 z-10 flex items-center justify-center w-full cursor-pointer h-44" :class="activeQuestion.question.buzzed ? 'bg-gray-500 no-pointer-events' : 'bg-red-400'" @click="pressBuzzer">
+    <div v-if="activeQuestion" class="absolute z-10 flex items-center justify-center w-1/2 cursor-pointer h-44" :class="activeQuestion.question.buzzed ? 'bg-gray-500 no-pointer-events' : 'bg-red-400'" @click="pressBuzzer">
       Buzzer
     </div>
 
     <!-- Player Table -->
-    <div class="relative pt-4 overflow-x-auto shadow-md">
-      <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th class="px-6 py-3">
-              Spieler
-            </th>
-            <th class="px-6 py-3">
-              Punkte
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(player, index) in players" :key="index" class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
-            <td class="px-6 py-4">
-              {{ player.name }}
-            </td>
-            <td class="px-6 py-4">
-              {{ player.points }}
-            </td>
-          </tr>
-          <tr v-if="players.length === 0">
-            <td colspan="2" class="px-6 py-4">
-              -
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="absolute bottom-0 left-0 flex justify-center w-full">
+      <div v-for="(player, index) in players" :key="index" class="relative justify-center inline-block w-64 ml-4 mr-4 text-xl font-medium text-center border-t-4 text-lightwhite h-44 border-lightgray border-x-4 bg-mediumgray">
+        <div class="absolute flex justify-center w-full bottom-44">
+          <img src="~/assets/img/user.svg" class="w-56">
+        </div>
+        <div class="px-6">
+          <p class="h-10 px-4 mt-2 border-b border-lightwhite">
+            {{ player.name }}
+          </p>
+        </div>
+        <div class="px-8 mt-12">
+          <p class="rounded-lg bg-graphitblack">
+            {{ player.points }}
+          </p>
+        </div>
+      </div>
     </div>
   </NerdContainer>
 </template>

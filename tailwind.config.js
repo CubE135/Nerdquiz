@@ -18,8 +18,11 @@ module.exports = {
       colors: {
         lightorange: '#FBC65B',
         darkorange: '#F29400',
-        darkgray: '#131413',
-        black: '#000000'
+        black: '#000000',
+        mediumgray: '#100F12',
+        lightgray: '#454547',
+        lightwhite: '#EBEBEB',
+        graphitblack: '#1c1c1c'
       }
     }
   },

@@ -1,7 +1,7 @@
 <template>
   <NerdContainer>
     <!-- Room Code -->
-    <h1 ref="heading" class="p-5 text-4xl font-bold text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <h1 ref="heading" class="p-5 text-4xl font-bold text-center text-gray-700 bg-lightwhite dark:bg-gray-700 dark:text-gray-400">
       <p>Room Code:</p>
       <p v-if="roomCode">
         {{ roomCode }}
@@ -72,7 +72,7 @@
 
     <!-- Board -->
     <div v-if="board.length >0" class="flex justify-center text-center" :style="drag ? 'pointer-events: none' : ''">
-      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 mt-2 bg-gray-50 dark:bg-gray-700">
+      <div v-for="boardCategory in board" :key="boardCategory.id" class="px-5 py-2 mt-2 bg-lightwhite dark:bg-gray-700">
         <p class="m-1">
           <NerdInput v-model="categories.find((category) => { return category.id === boardCategory.id }).title" classes="w-32 justify-center text-center" placeholder="Kategorie Titel" />
         </p>
@@ -134,20 +134,20 @@
     </div>
 
     <!-- Board Actions -->
-    <div v-else class="px-5 py-2 font-bold text-center dark:text-gray-400 test-sm">
+    <div v-else class="px-5 py-2 font-bold text-center text-gray-700 bg-lightwhite test-sm">
       Füge Kategorien und Level hinzu!
     </div>
     <div :style="drag ? 'pointer-events: none' : ''">
       <div class="flex justify-center">
-        <NerdButton :class="categories.length >= 10 || roomStarted ? 'disabled' : ''" text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
-        <NerdButton :class="levels.length >= 9 || roomStarted ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
+        <NerdButton class="w-48" :class="categories.length >= 10 || roomStarted ? 'disabled' : ''" text="Kategorie hinzufügen" size="sm" @click="openModal('modalCategory')" />
+        <NerdButton class="w-48" :class="levels.length >= 9 || roomStarted ? 'disabled' : ''" text="Level hinzufügen" size="sm" @click="openModal('modalLevel')" />
       </div>
     </div>
 
     <!-- Player Table -->
     <div class="relative mt-2 overflow-x-auto shadow-md">
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <thead class="text-sm text-gray-700 uppercase bg-lightwhite dark:bg-gray-700 dark:text-gray-400">
           <tr>
             <th class="px-6 py-3">
               Spieler
@@ -164,7 +164,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(player, index) in players" :key="index" class="bg-white border-b dark:bg-gray-900 dark:border-gray-700">
+          <tr v-for="(player, index) in players" :key="index" class="border-b bg-lightwhite dark:bg-gray-900 dark:border-gray-700">
             <td class="px-6 py-4">
               {{ player.name }}
             </td>
@@ -185,8 +185,9 @@
       </table>
     </div>
     <div class="flex justify-center">
-      <NerdButton text="Spiel Starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
+      <NerdButton class="w-40" text="Spiel starten" size="sm" :disabled="roomStarted || (categories.length === 0 || levels.length === 0)" @click="startGame" />
     </div>
+
     <!-- Modals -->
     <NerdModal ref="modalCategory" title="Kategorie hinzufügen" @save="addNewCategory">
       <template #content>
